@@ -1,0 +1,91 @@
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
+        self.height = 0
+        self.left_height = 0
+        self.right_height = 0
+
+class Tree:
+    def __init__(self):
+        self.root = None
+        self.leafs = set()
+    def add_to_pos(self, node, data):
+        if node.data == data:
+            return
+        if data < node.data:
+            if node.left is None:
+                node.left = Node(data)
+            else:
+                self.add_to_pos(node.left, data)
+        else:
+            if node.right is None:
+                node.right = Node(data)
+            else:
+                self.add_to_pos(node.right, data)
+
+    def add(self, data):
+        if self.root is None:
+            self.root = Node(data)
+            return
+        self.add_to_pos(self.root, data)
+        
+    def print_node(self, node):
+        if node.left:
+            self.print_node(node.left)
+        print(node.data, end = ' ')
+        if node.right:
+            self.print_node(node.right)
+
+    def print(self):
+        if self.root:
+            self.print_node(self.root)
+
+    def find_height(self, node):
+        if not self.root:
+            self.root = Node(None)
+            self.root.height = 0
+        else:
+            if not node.right and not node.left:
+                node.height = 1
+                node.left_height = 1
+                node.right_height = 1
+                self.leafs.add(node.data)
+            if node.left:
+                self.find_height(node.left)
+                node.height = node.left.height + 1
+                node.left_height = node.left.height
+            if node.right:
+                self.find_height(node.right)
+                node.right_height = node.right.height
+                if node.right.height + 1 >  node.height:
+                    node.height = node.right.height + 1
+
+    def find_leafs(self, node):
+        if not self.root:
+            self.root = Node(None)
+        else:
+            if not node.right and not node.left:
+                self.leafs.add(node.data)
+            if node.left:
+                self.find_height(node.left)
+            if node.right:
+                self.find_height(node)
+    
+    def compare_heights(self, node):
+        if -1 <= node.left_height - node.right_height <= 1:
+            if node.left:
+                self.compare_heights(node.left)
+            if node.right:
+                self.compare_heights(node.right)
+        else:
+            return 'NO'
+        return 'YES'
+ 
+tree = Tree()
+numbers = [int(j) for j in input().split()]
+for number in numbers:
+    tree.add(number)
+tree.find_height(tree.root)
+print(tree.compare_heights(tree.root))
